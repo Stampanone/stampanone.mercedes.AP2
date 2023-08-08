@@ -27,8 +27,8 @@ public class HomebankingApplication {
 			clientRepository.save(client);
 			clientRepository.save(client2);
 
-			Account account = new Account("VIN001", LocalDate.now(),5000.0,client);
-			Account account2 = new Account("VIN002", LocalDate.EPOCH.plusDays(1), 7500.0,client);
+			Account account = new Account("VIN001", LocalDate.now(),5000.0);
+			Account account2 = new Account("VIN002", LocalDate.now().plusDays(1), 7500.0);
 
 			client.addAccounts(account);
 			client.addAccounts(account2);

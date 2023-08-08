@@ -23,11 +23,10 @@ public class Account {
     public Account() {
     }
 
-    public Account(String number, LocalDate creationDate, Double balance, Client owner) {
+    public Account(String number, LocalDate creationDate, Double balance) {
         this.number = number;
         this.creationDate = creationDate;
         this.balance = balance;
-        this.owner = owner;
     }
 
     public Long getId() {
