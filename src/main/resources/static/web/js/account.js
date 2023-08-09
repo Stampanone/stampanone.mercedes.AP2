@@ -15,6 +15,7 @@ Vue.createApp({
                     //get client ifo
                     this.accountInfo = response.data;
                     this.accountInfo.transactions.sort((a, b) => b.id - a.id)
+                    console.log(accountInfo)
                 })
                 .catch((error) => {
                     // handle error
