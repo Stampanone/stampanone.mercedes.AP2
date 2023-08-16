@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
@@ -19,17 +18,11 @@ public class AccountController {
 
     @RequestMapping("/accounts")
     public List<AccountDTO> getAccount(){
-        List<Account> allAccount = accountRepository.findAll();
-
-        List<AccountDTO> convertedList = allAccount.stream().map(account -> new AccountDTO(account)).collect(Collectors.toList());
-
-        return convertedList;
+        return accountRepository.findAll().stream().map(account -> new AccountDTO(account)).collect(Collectors.toList());
     }
 
     @RequestMapping("/accounts/{id}")
     public AccountDTO getAccountById(@PathVariable Long id){
-        Optional<Account> account = accountRepository.findById(id);
-        return new AccountDTO(account.get());
-
+        return new AccountDTO(accountRepository.findById(id).orElse(null));
     }
 }
