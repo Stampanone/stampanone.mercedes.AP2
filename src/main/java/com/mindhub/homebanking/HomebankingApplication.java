@@ -2,10 +2,12 @@ package com.mindhub.homebanking;
 
 import com.mindhub.homebanking.models.*;
 import com.mindhub.homebanking.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,15 +20,20 @@ public class HomebankingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HomebankingApplication.class, args);
 	}
-
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, LoanRepository loanRepository, ClientLoanRepository clientLoanRepository,CardRepository cardRepository){
 		return(args) -> {
-			Client client = new Client("Melba","Morel", "melba@mindhub.com");
-			Client client2 = new Client("Juli","Stampanone", "black@gmail.com");
+
+
+			Client client = new Client("Melba","Morel", "melba@mindhub.com", passwordEncoder.encode("123"));
+			Client client2 = new Client("Juli","Stampanone", "black@gmail.com",passwordEncoder.encode("321"));
+			Client client3 = new Client("Admin","Admin", "admin@gmail.com",passwordEncoder.encode("456"));
 
 			clientRepository.save(client);
 			clientRepository.save(client2);
+			clientRepository.save(client3);
 
 			Account account = new Account("VIN001", LocalDate.now(),5000.0);
 			Account account2 = new Account("VIN002", LocalDate.now().plusDays(1), 7500.0);
