@@ -1,13 +1,17 @@
 package com.mindhub.homebanking.controllers;
 
 import com.mindhub.homebanking.dtos.AccountDTO;
+import com.mindhub.homebanking.models.Account;
+import com.mindhub.homebanking.models.Client;
 import com.mindhub.homebanking.repositories.AccountRepository;
+import com.mindhub.homebanking.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 @RestController
@@ -15,16 +19,41 @@ import java.util.stream.Collectors;
 public class AccountController {
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     @GetMapping("/accounts")
     public List<AccountDTO> getAccount(){
         return accountRepository.findAll().stream().map(account -> new AccountDTO(account)).collect(Collectors.toList());
     }
 
-    @GetMapping("/accounts/{id}")
+    /*@GetMapping("/accounts/{id}")
     public AccountDTO getAccountById(@PathVariable Long id){
         return new AccountDTO(accountRepository.findById(id).orElse(null));
+    }*/
+    @GetMapping("/accounts/{id}")
+    public ResponseEntity<Object> getAccountById(Authentication authentication) {
+        Client client = clientRepository.findByEmail(authentication.getName());
+
     }
 
 
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
+    @PostMapping("/clients/current/accounts")
+    public ResponseEntity<Object> creatAccount(Authentication authentication) {
+        Client client = clientRepository.findByEmail(authentication.getName());
+        String numberRamdom ="VIN-" + getRandomNumber(0,99999999);
+        if (client.getAccounts().size() >= 3) {
+            return new ResponseEntity<>("403 Prohibido, max 3 accounts", HttpStatus.FORBIDDEN);
+        }
+        if (!accountRepository.existsByNumber(numberRamdom)) {
+            client.addAccounts(accountRepository.save(new Account( numberRamdom, LocalDate.now(), 0.0)));
+            clientRepository.save(client);
+        }
+
+        return new ResponseEntity<>("201 Creada", HttpStatus.CREATED);
+    }
 }
