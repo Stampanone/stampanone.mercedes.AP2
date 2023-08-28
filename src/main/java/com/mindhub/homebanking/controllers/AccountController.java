@@ -32,9 +32,18 @@ public class AccountController {
         return new AccountDTO(accountRepository.findById(id).orElse(null));
     }*/
     @GetMapping("/accounts/{id}")
-    public ResponseEntity<Object> getAccountById(Authentication authentication) {
+    public ResponseEntity<Object> getAccountById(Authentication authentication, @PathVariable Long id) {
         Client client = clientRepository.findByEmail(authentication.getName());
+        if (client != null){
+            new AccountDTO(accountRepository.findById(id).orElse(null));
+        }
+        return new ResponseEntity<>("Autorizacion aprobada", HttpStatus.ACCEPTED);
+    }
 
+    @GetMapping("/clients/current/accounts")
+    public List<AccountDTO> getAccounts(Authentication authentication){
+        Client client = clientRepository.findByEmail(authentication.getName());
+        return client.getAccounts().stream().map(AccountDTO::new).collect(Collectors.toList());
     }
 
 
