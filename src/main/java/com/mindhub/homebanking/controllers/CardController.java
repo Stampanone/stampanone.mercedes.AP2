@@ -38,7 +38,9 @@ public class CardController {
     }
 
     @PostMapping("/clients/current/cards")
-    public ResponseEntity<Object> createCard(Authentication authentication, @RequestParam CardType cardType,@RequestParam CardColor cardColor) {
+    public ResponseEntity<Object> createCard(Authentication authentication,
+                                             @RequestParam CardType cardType,
+                                             @RequestParam CardColor cardColor) {
         Client client = clientRepository.findByEmail(authentication.getName());
         Set<Card> cards = client.getCards();
 

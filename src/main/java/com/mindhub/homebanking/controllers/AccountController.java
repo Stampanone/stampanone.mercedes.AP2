@@ -31,13 +31,15 @@ public class AccountController {
     public AccountDTO getAccountById(@PathVariable Long id){
         return new AccountDTO(accountRepository.findById(id).orElse(null));
     }*/
+
     @GetMapping("/accounts/{id}")
     public ResponseEntity<Object> getAccountById(Authentication authentication, @PathVariable Long id) {
         Client client = clientRepository.findByEmail(authentication.getName());
-        if (client != null){
-            new AccountDTO(accountRepository.findById(id).orElse(null));
+        Account account = accountRepository.findByIdAndOwner(id,client);
+        if (account == null){
+            return new ResponseEntity<>("No autorizado",HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>("Autorizacion aprobada", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new AccountDTO(account),HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/clients/current/accounts")
