@@ -7,6 +7,9 @@ import com.mindhub.homebanking.models.TransactionType;
 import com.mindhub.homebanking.repositories.AccountRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
 import com.mindhub.homebanking.repositories.TransactionRepository;
+import com.mindhub.homebanking.services.AccountService;
+import com.mindhub.homebanking.services.ClientService;
+import com.mindhub.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
 public class TransactionController {
 
     @Autowired
-    TransactionRepository transactionRepository;
+    private TransactionService transactionService;
     @Autowired
-    ClientRepository clientRepository;
+    private ClientService clientService;
     @Autowired
-    AccountRepository accountRepository;
+    private AccountService accountService;
     @Transactional
     @PostMapping("/transactions")
     public ResponseEntity<Object> createTransaction(Authentication authentication,
@@ -38,15 +39,15 @@ public class TransactionController {
                                                     @RequestParam String toAccountNumber,
                                                     @RequestParam Double amount,
                                                     @RequestParam String description){
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
 
         if (fromAccountNumber.equals(toAccountNumber)){
             return new ResponseEntity<>("403, no puede ingresar misma cuenta", HttpStatus.FORBIDDEN);
         }
-        if (!accountRepository.existsByNumber(fromAccountNumber)){
+        if (!accountService.existsByNumber(fromAccountNumber)){
             return new ResponseEntity<>("403, no exite cuenta de origen", HttpStatus.FORBIDDEN);
         }
-        if (!accountRepository.existsByNumber(toAccountNumber)){
+        if (!accountService.existsByNumber(toAccountNumber)){
             return new ResponseEntity<>("403, no existe la cuenta de destino",HttpStatus.FORBIDDEN);
         }
         if (description == null){
@@ -57,8 +58,8 @@ public class TransactionController {
             return new ResponseEntity<>("403, monto inconsistente",HttpStatus.FORBIDDEN);
         }
 
-        Account accountClient = accountRepository.findByNumber(fromAccountNumber);
-        Account accountDestiny = accountRepository.findByNumber(toAccountNumber);
+        Account accountClient = accountService.findByNumber(fromAccountNumber);
+        Account accountDestiny = accountService.findByNumber(toAccountNumber);
 
 
         if (!client.getAccounts().contains(accountClient)){
@@ -74,17 +75,15 @@ public class TransactionController {
         accountClient.addTransaction(transactionOrigen);
         accountDestiny.addTransaction(transactionDestiny);
 
-        transactionRepository.save(transactionOrigen);
-        transactionRepository.save(transactionDestiny);
+        transactionService.save(transactionOrigen);
+        transactionService.save(transactionDestiny);
 
-        Double balanceAccountsClient = accountClient.getBalance();
-        Double balanceAccountsDestiny = accountDestiny.getBalance();
 
-        accountClient.setBalance(balanceAccountsClient - amount);
-        accountDestiny.setBalance(balanceAccountsDestiny + amount);
+        accountClient.setBalance((accountClient.getBalance()) - amount);
+        accountDestiny.setBalance((accountDestiny.getBalance()) + amount);
 
-        accountRepository.save(accountClient);
-        accountRepository.save(accountDestiny);
+        accountService.save(accountClient);
+        accountService.save(accountDestiny);
         return new ResponseEntity<>("200, transaccion creada",HttpStatus.CREATED);
     }
 }

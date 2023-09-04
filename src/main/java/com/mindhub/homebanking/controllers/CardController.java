@@ -7,6 +7,8 @@ import com.mindhub.homebanking.models.CardType;
 import com.mindhub.homebanking.models.Client;
 import com.mindhub.homebanking.repositories.CardRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.CardService;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +25,13 @@ import java.util.stream.Collectors;
 public class CardController {
 
     @Autowired
-    CardRepository cardRepository;
+    private CardService cardService;
     @Autowired
-    private ClientRepository clientRepository;
+    private ClientService clientService;
 
     @GetMapping("/clients/current/cards")
     public List<CardDTO> getCards (Authentication authentication){
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
         return client.getCards().stream().map(CardDTO ::new).collect(Collectors.toList());
     }
 
@@ -41,7 +43,7 @@ public class CardController {
     public ResponseEntity<Object> createCard(Authentication authentication,
                                              @RequestParam CardType cardType,
                                              @RequestParam CardColor cardColor) {
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
         Set<Card> cards = client.getCards();
 
         if(!cards.stream().filter(card -> card.getType().equals(cardType))
@@ -54,8 +56,8 @@ public class CardController {
         }*/
 
 
-        client.addCards(cardRepository.save(new Card(cardType, client.getFirstName()+ " "+ client.getLastName(),getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999),getRandomNumber(100,999),LocalDate.now(),LocalDate.now().plusYears(5), cardColor)));
-        clientRepository.save(client);
+        client.addCards(cardService.saveCard(new Card(cardType, client.getFirstName()+ " "+ client.getLastName(),getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999),getRandomNumber(100,999),LocalDate.now(),LocalDate.now().plusYears(5), cardColor)));
+        clientService.saveClient(client);
         return new ResponseEntity<>("201 Creada", HttpStatus.CREATED);
     }
 }
