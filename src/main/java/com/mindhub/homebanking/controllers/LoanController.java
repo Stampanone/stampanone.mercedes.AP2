@@ -3,10 +3,7 @@ package com.mindhub.homebanking.controllers;
 import com.mindhub.homebanking.dtos.LoanApplicationDTO;
 import com.mindhub.homebanking.dtos.LoanDTO;
 import com.mindhub.homebanking.models.*;
-import com.mindhub.homebanking.services.AccountService;
-import com.mindhub.homebanking.services.ClientService;
-import com.mindhub.homebanking.services.LoanService;
-import com.mindhub.homebanking.services.TransactionService;
+import com.mindhub.homebanking.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +25,8 @@ public class LoanController {
     private TransactionService transactionService;
     @Autowired
     private LoanService loanService;
+    @Autowired
+    private ClientLoanService clientLoanService;
 
     @GetMapping("/loans")
     public List<LoanDTO> getLoans (){
@@ -67,6 +66,7 @@ public class LoanController {
         transactionService.save(transactionDestiny);
         accountDestiny.setBalance((accountDestiny.getBalance()) + loanApplicationDTO.getAmount());
         accountService.save(accountDestiny);
+        clientLoanService.save(clientLoan);
 
         return new ResponseEntity<>("Aceptado", HttpStatus.ACCEPTED);
     }
