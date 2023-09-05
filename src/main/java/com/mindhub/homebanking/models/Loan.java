@@ -15,7 +15,7 @@ public class Loan {
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
     private String name;
-    private Integer maxAmoun;
+    private Integer maxAmount;
     @ElementCollection
     @Column(name="payment")
     private List<Integer> payments;
@@ -25,9 +25,9 @@ public class Loan {
     public Loan() {
     }
 
-    public Loan(String name, Integer maxAmoun, List<Integer> payments) {
+    public Loan(String name, Integer maxAmount, List<Integer> payments) {
         this.name = name;
-        this.maxAmoun = maxAmoun;
+        this.maxAmount = maxAmount;
         this.payments = payments;
     }
 
@@ -39,8 +39,8 @@ public class Loan {
         return name;
     }
 
-    public Integer getMaxAmoun() {
-        return maxAmoun;
+    public Integer getMaxAmount() {
+        return maxAmount;
     }
 
     public List<Integer> getPayments() {
@@ -55,8 +55,8 @@ public class Loan {
         this.name = name;
     }
 
-    public void setMaxAmoun(Integer maxAmoun) {
-        this.maxAmoun = maxAmoun;
+    public void setMaxAmount(Integer maxAmount) {
+        this.maxAmount = maxAmount;
     }
     public void addClientLoan(ClientLoan clientLoan){
         clientLoan.setLoan(this);

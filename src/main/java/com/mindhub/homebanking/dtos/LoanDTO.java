@@ -7,13 +7,13 @@ import java.util.List;
 public class LoanDTO {
     private Long id;
     private String name;
-    private Integer maxAmoun;
+    private Integer maxAmount;
     private List<Integer> payments;
 
     public LoanDTO (Loan loan){
         this.id = loan.getId();
         this.name = loan.getName();
-        this.maxAmoun = loan.getMaxAmoun();
+        this.maxAmount = loan.getMaxAmount();
         this.payments = loan.getPayments();
     }
 
@@ -25,8 +25,8 @@ public class LoanDTO {
         return name;
     }
 
-    public Integer getMaxAmoun() {
-        return maxAmoun;
+    public Integer getMaxAmount() {
+        return maxAmount;
     }
 
     public List<Integer> getPayments() {

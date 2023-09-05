@@ -45,7 +45,7 @@ public class LoanController {
         if (loan== null){
             return new ResponseEntity<>("403, No existe el prestamo",HttpStatus.FORBIDDEN);
         }
-        if (loan.getMaxAmoun() < loanApplicationDTO.getAmount()){
+        if (loan.getMaxAmount() < loanApplicationDTO.getAmount()){
             return new ResponseEntity<>("403, Monto exedido",HttpStatus.FORBIDDEN);
         }
         if (!payments.contains(loanApplicationDTO.getPayments())){
