@@ -45,6 +45,9 @@ public class CardController {
                                              @RequestParam CardColor cardColor) {
         Client client = clientService.findByEmail(authentication.getName());
         Set<Card> cards = client.getCards();
+        if (cardType == null || cardColor == null){
+            return new ResponseEntity<>("403, Algun campo vacio", HttpStatus.FORBIDDEN);
+        }
 
         if(!cards.stream().filter(card -> card.getType().equals(cardType))
                          .filter(card -> card.getColor().equals(cardColor)).collect(Collectors.toList()).isEmpty()){
