@@ -45,4 +45,7 @@ public class AccountServiceImplement implements AccountService {
     public Account findByNumber(String number) {
         return accountRepository.findByNumber(number);
     }
+
+    @Override
+    public void delete(Long id) {accountRepository.deleteById(id);}
 }

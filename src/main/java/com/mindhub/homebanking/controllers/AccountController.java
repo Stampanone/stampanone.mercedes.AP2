@@ -2,11 +2,14 @@ package com.mindhub.homebanking.controllers;
 
 import com.mindhub.homebanking.dtos.AccountDTO;
 import com.mindhub.homebanking.models.Account;
+import com.mindhub.homebanking.models.Card;
 import com.mindhub.homebanking.models.Client;
+import com.mindhub.homebanking.models.Transaction;
 import com.mindhub.homebanking.repositories.AccountRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
 import com.mindhub.homebanking.services.AccountService;
 import com.mindhub.homebanking.services.ClientService;
+import com.mindhub.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
@@ -24,6 +28,8 @@ public class AccountController {
     private AccountService accountService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private TransactionService transactionService;
 
     @GetMapping("/accounts")
     public List<AccountDTO> getAccount(){
@@ -69,5 +75,17 @@ public class AccountController {
         }
 
         return new ResponseEntity<>("201 Creada", HttpStatus.CREATED);
+    }
+    @DeleteMapping("/clients/current/account/delete/{id}")
+    public ResponseEntity<Object> deleteAccount(Authentication authentication, @PathVariable Long id) {
+        Client client = clientService.findByEmail(authentication.getName());
+        Account account = (Account) client.getAccounts().stream().filter(account1 -> account1.getId().equals(id));
+        if (!(account == null)){
+            accountService.delete(id);
+            Set<Transaction> transactions = account.getTransactions();
+            //eliminar TODAS las transacciones
+            return new ResponseEntity<>("200, Delete Account",HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("403, Not delete account",HttpStatus.FORBIDDEN);
     }
 }

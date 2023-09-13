@@ -15,4 +15,5 @@ public interface AccountService {
     boolean existsByNumber(String number);
 
     Account findByNumber(String number);
+    void delete (Long id);
 }

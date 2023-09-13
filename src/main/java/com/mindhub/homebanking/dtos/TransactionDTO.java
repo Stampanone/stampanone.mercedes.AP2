@@ -11,6 +11,7 @@ public class TransactionDTO {
     private Double amount;
     private String description;
     private LocalDate date;
+    private Double amountAccount;
 
 
     public TransactionDTO (Transaction transaction){
@@ -19,6 +20,7 @@ public class TransactionDTO {
         this.amount = transaction.getAmount();
         this.description = transaction.getDescription();
         this.date = transaction.getDate();
+        this.amountAccount = transaction.getAccount().getBalance();
     }
 
     public Long getId() {return id;}
@@ -30,4 +32,5 @@ public class TransactionDTO {
     public String getDescription() {return description;}
 
     public LocalDate getDate() {return date;}
+    public  Double getAmountAccount(){return amountAccount;}
 }

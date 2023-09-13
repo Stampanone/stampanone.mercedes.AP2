@@ -5,10 +5,9 @@ import com.mindhub.homebanking.models.Card;
 import com.mindhub.homebanking.models.CardColor;
 import com.mindhub.homebanking.models.CardType;
 import com.mindhub.homebanking.models.Client;
-import com.mindhub.homebanking.repositories.CardRepository;
-import com.mindhub.homebanking.repositories.ClientRepository;
 import com.mindhub.homebanking.services.CardService;
 import com.mindhub.homebanking.services.ClientService;
+import com.mindhub.homebanking.utils.CardUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +34,6 @@ public class CardController {
         return client.getCards().stream().map(CardDTO ::new).collect(Collectors.toList());
     }
 
-    public int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
-    }
 
     @PostMapping("/clients/current/cards")
     public ResponseEntity<Object> createCard(Authentication authentication,
@@ -59,8 +55,19 @@ public class CardController {
         }*/
 
 
-        client.addCards(cardService.saveCard(new Card(cardType, client.getFirstName()+ " "+ client.getLastName(),getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999)+"-"+getRandomNumber(0,9999),getRandomNumber(100,999),LocalDate.now(),LocalDate.now().plusYears(5), cardColor)));
+        client.addCards(cardService.saveCard(new Card(cardType, client.getFirstName()+ " "+ client.getLastName(),CardUtils.getCardNumber(), CardUtils.getCVV(),LocalDate.now(),LocalDate.now().plusYears(5), cardColor)));
         clientService.saveClient(client);
         return new ResponseEntity<>("201 Creada", HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/clients/current/card/delete/{id}")
+    public ResponseEntity<Object> deleteCard(Authentication authentication, @PathVariable Long id){
+        Client client = clientService.findByEmail(authentication.getName());
+        Set<Card> cards = client.getCards();
+        if (cards.stream().filter(card -> card.getId().equals(id)).count()==1){
+            cardService.delete(id);
+            return new ResponseEntity<>("200, Delete Card",HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("403, Not delete card",HttpStatus.FORBIDDEN);
     }
 }
